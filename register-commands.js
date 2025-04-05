@@ -2,7 +2,7 @@ import { REST, Routes, SlashCommandBuilder } from 'discord.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const CLIENT_ID = 'YOUR_DISCORD_APP_ID_HERE';
+const CLIENT_ID = 'const CLIENT_ID = '1357872922399740015';
 const TOKEN = process.env.DISCORD_TOKEN;
 
 const commands = [
