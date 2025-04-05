@@ -77,36 +77,39 @@ client.on('interactionCreate', async (interaction) => {
     });
   }
 
-  if (interaction.commandName === 'my-ballerz') {
-    const userId = interaction.user.id;
-    const wallet = walletLinks.get(userId);
+if (interaction.commandName === 'my-ballerz') {
+  const userId = interaction.user.id;
+  const wallet = walletLinks.get(userId);
 
-    if (!wallet) {
-      await interaction.reply({ content: `❌ You haven't linked a wallet yet. Use /link-wallet first.`, ephemeral: true });
-      return;
+  if (!wallet) {
+    await interaction.reply({ content: `❌ You haven't linked a wallet yet. Use /link-wallet first.`, ephemeral: true });
+    return;
+  }
+
+  await interaction.deferReply({ ephemeral: true });
+
+  try {
+    const { data } = await axios.get(`https://flowdiver.io/api/nfts?wallet=${wallet}`);
+    
+    const ballerz = data.nfts.filter(nft =>
+      nft.collection_name?.toLowerCase().includes('ballerz')
+    );
+
+    if (ballerz.length === 0) {
+      await interaction.editReply(`🕵️ No Ballerz found in wallet \`${wallet}\`.`);
+    } else {
+      const ballerzList = ballerz.map(nft =>
+        `#${nft.token_id} – ${nft.name || 'Ballerz NFT'}`
+      ).join('\n');
+
+      await interaction.editReply(`🏀 Found ${ballerz.length} Ballerz NFT(s):\n\`\`\`\n${ballerzList}\n\`\`\``);
     }
 
-    await interaction.deferReply({ ephemeral: true });
-
-    try {
-      const { data } = await axios.get(`https://rest-mainnet.graffle.org/accounts/${wallet}/nfts`);
-      
-      // Filter Ballerz NFTs (based on collection name or ID)
-      const ballerz = data.data.filter(nft =>
-        nft.collection?.toLowerCase().includes('ballerz')
-      );
-
-      if (ballerz.length === 0) {
-        await interaction.editReply(`🕵️ No Ballerz found in wallet \`${wallet}\`.`);
-      } else {
-        const ballerzList = ballerz.map(nft => {
-          const name = nft.display?.name || `Ballerz #${nft.id}`;
-          return `#${nft.id} – ${name}`;
-        }).join('\n');
-
-        await interaction.editReply(`🏀 Found ${ballerz.length} Ballerz NFT(s):\n\`\`\`\n${ballerzList}\n\`\`\``);
-      }
-
+  } catch (err) {
+    console.error('❌ Error fetching from Flowdiver:', err);
+    await interaction.editReply(`❌ Error fetching Ballerz. Try again later.`);
+  }
+}
     } catch (err) {
       console.error('❌ Error fetching from Graffle:', err);
       await interaction.editReply(`❌ Error fetching Ballerz. Try again later.`);
