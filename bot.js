@@ -89,7 +89,10 @@ if (interaction.commandName === 'my-ballerz') {
   await interaction.deferReply({ ephemeral: true });
 
   try {
-    const { data } = await axios.get(`https://flowdiver.io/api/nfts?wallet=${wallet}`);
+const { data } = await axios.get(
+  `https://flowdiver.io/api/nfts?wallet=${wallet}`,
+  { timeout: 7000 }
+); // 👈 This closing parenthesis is what the error was about
     
     const ballerz = data.nfts.filter(nft =>
       nft.collection_name?.toLowerCase().includes('ballerz')
