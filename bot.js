@@ -89,12 +89,13 @@ client.on('interactionCreate', async (interaction) => {
 
     await interaction.deferReply({ ephemeral: true });
 
-const { data } = await axios.get(
-  `https://flowdiver.io/api/nfts?wallet=${wallet.toLowerCase()}`,
-  { timeout: 7000 }
-);
+    try {
+      const { data } = await axios.get(
+        `https://flowdiver.io/api/nfts?wallet=${wallet.toLowerCase()}`,
+        { timeout: 7000 }
+      );
 
-      const ballerz = response.data.nfts.filter(nft =>
+      const ballerz = data.nfts.filter(nft =>
         nft.collection_name?.toLowerCase().includes('ballerz')
       );
 
